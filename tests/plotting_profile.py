@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from plotting import profile as profile
-from plotting import style as style
+from plotting import profile
+from plotting import style
 
 ntests = 100000
 brange = (-10, 10 )
@@ -29,7 +29,7 @@ dtdata = generateData(25)
 rtdata = generateData(5)
 
 class test_profiles(unittest.TestCase):
-    """ Test the profile plotting with a TestCase class """    
+    """ Test the profile plotting with a TestCase class """
 
     # Test a single profile plot
     def test_profile_single(self):
@@ -43,7 +43,6 @@ class test_profiles(unittest.TestCase):
                      yvals=['y'],
                      axs= [ax])
         fig.savefig('test_profile_single.png')
-        pass
 
     # Test a single profile plot
     def test_profile_single_red(self):
@@ -58,7 +57,6 @@ class test_profiles(unittest.TestCase):
                      axs= [ax],
                      pstyle = style.style(color='red'))
         fig.savefig('test_profile_single_red.png')
-        pass
 
     # Test a single profile plot with range
     def test_profile_single_range(self):
@@ -73,7 +71,6 @@ class test_profiles(unittest.TestCase):
                      axs= [ax],
                      decos={'range' : style.style(color='green', alpha=0.2)})
         fig.savefig('test_profile_single_range.png')
-        pass
 
     # Test a single profile plot with scatter
     def test_profile_single_scatter(self):
@@ -88,7 +85,6 @@ class test_profiles(unittest.TestCase):
                      axs= [ax],
                      decos={'scatter': style.style(color='red', marker='.', alpha=0.1)})
         fig.savefig('test_profile_single_scatter.png')
-        pass
 
     # Test a single profile plot with scatter
     def test_profile_single_ragne_scatter(self):
@@ -105,7 +101,6 @@ class test_profiles(unittest.TestCase):
                          'range': style.style(color='green', alpha=0.2),
                          'scatter': style.style(color='red', marker='.', alpha=0.1)})
         fig.savefig('test_profile_single_range_scatter.png')
-        pass
 
     # Test a two profile plots
     def test_profile_two_plots(self):
@@ -119,8 +114,6 @@ class test_profiles(unittest.TestCase):
                      yvals=['y', 'z'],
                      axs= axs)
         fig.savefig('test_profile_two_plots.png')
-        pass
-
 
     # Test ratio of two profile plots
     def test_profile_two_overlaid(self):
@@ -138,7 +131,6 @@ class test_profiles(unittest.TestCase):
                         ddecos = { 0 : {'range' : style.style(color='red', alpha=0.1)},
                                    1 : {'range' : style.style(color='blue', alpha=0.1)}})
         fig.savefig('test_profile_two_overlaid.png')
-        pass
 
      # Test ratio of two profile plots with ratio plot
     def test_profile_two_overlaid_ratio(self):
@@ -159,7 +151,6 @@ class test_profiles(unittest.TestCase):
                                    1 : {'range' : style.style(color='blue', alpha=0.1)}},
                         rax = axs[1])
         fig.savefig('test_profile_two_overlaid_ratio.png')
-        pass
 
 if __name__ == '__main__':
     unittest.main()

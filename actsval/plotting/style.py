@@ -9,7 +9,7 @@ class style :
                        linestyle = None,
                        linewidth = 1.,
                        alpha = None) -> None:
-        """ constructor with default arguments """        
+        """ constructor with default arguments """
         self.color = color
         self.marker = marker
         self.markersize = markersize
@@ -43,10 +43,10 @@ class style :
 
     def get_style(self) -> dict:
         """ Get the style as a decitionary"""
-        return {'color': self.color, 
-                'marker': self.marker, 
-                'linestyle': self.linestyle, 
-                'linewidth': self.linewidth, 
+        return {'color': self.color,
+                'marker': self.marker,
+                'linestyle': self.linestyle,
+                'linewidth': self.linewidth,
                 'alpha': self.alpha}
 
     def get_color(self) :
