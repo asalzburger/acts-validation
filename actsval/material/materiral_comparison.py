@@ -1,12 +1,11 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import uproot
-import math
 import argparse
+import math
+import uproot
+import matplotlib.pyplot as plt
+import pandas as pd
 
-import plotting.style as style
-import plotting.profile as profile
+from plotting import style as style
+from plotting import profile as profile
 
 p = argparse.ArgumentParser()
 
@@ -65,7 +64,7 @@ for i, (input_file, color) in enumerate(zip(args.input, args.color)):
     df = pd.DataFrame({"v_eta" : urf["v_eta"].array(library="np"),
                        "t_X0" : urf["t_X0"].array(library="np")})
     dFrames.append(df)
-    dStyles[i] = style.style(color=color, marker=args.marker[i])  
+    dStyles[i] = style.style(color=color, marker=args.marker[i])
     decos = {}
     for d in args.decorators:
         if d == "range":
@@ -79,12 +78,12 @@ for i, (input_file, color) in enumerate(zip(args.input, args.color)):
 fig_eta, axs_eta = plt.subplots(2, 1, figsize=args.figsize, sharex=True, gridspec_kw={'height_ratios': [2, 1]})
 fig_eta.subplots_adjust(hspace=0.05)
 
-profile.overlay(ax=axs_eta[0], 
-                dframes=dFrames, 
-                xval='v_eta', 
-                yval='t_X0', 
-                bins=args.eta_bins, 
-                brange=args.eta_range, 
+profile.overlay(ax=axs_eta[0],
+                dframes=dFrames,
+                xval='v_eta',
+                yval='t_X0',
+                bins=args.eta_bins,
+                brange=args.eta_range,
                 dStyles=dStyles,
                 dDecos=dDecos,
                 rAx=axs_eta[1])
