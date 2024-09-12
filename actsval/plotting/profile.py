@@ -11,7 +11,9 @@ def plot(axs: list,
          yvals: list, 
          style: style = style.style(),
          decos: list = [],
-         legend: bool = False):
+         legend: bool = False,
+         labelx: bool = True,
+         labely: bool = True) -> pd.DataFrame:
 
     # Check axes versus yval length
     if len(axs) != len(yvals):
@@ -63,16 +65,16 @@ def plot(axs: list,
         # plot as errorbar
         ax.errorbar(x=y_binned["bin_center"], 
                     y=y_binned["mean"],
-                    yerr=y_binned["sem"], 
+                    yerr=np.abs(y_binned["sem"]), 
                     xerr=y_binned["xerr"],
-                    fmt="o", 
                     label=yval,
                     color = style.get_color(), 
-                    marker = style.get_marker(), 
-                    linewidth = style.get_linewidth(), 
+                    fmt = style.get_marker(), 
                     alpha = style.get_alpha())
-        ax.set_xlabel(xval)
-        ax.set_ylabel(yval)
+        if labelx:
+            ax.set_xlabel(xval)
+        if labely:
+            ax.set_ylabel(yval)
 
         if legend:
             ax.legend()
@@ -81,6 +83,17 @@ def plot(axs: list,
 
 
 # Overlay a reference frame on top of a target frame
+#
+# ax: the axis to plot on
+# dframes: the dataframes to plot
+# xval: the x value to plot
+# yval: the y value to plot
+# bins: the number of bins
+# brange: the range of the bins
+# dStyles: the styles for each frame
+# dDecos: the decorations for each frame
+# rAx: the axis for the ratio plot
+#
 def overlay(ax, 
             dframes,
             xval : str, 
@@ -89,7 +102,7 @@ def overlay(ax,
             brange : list,
             dStyles = {},
             dDecos = {},
-            ratio_ax = None) :
+            rAx = None) :
     
     for idf, (dframe, dStyle) in enumerate(zip(dframes, dStyles)):
         # set the style
@@ -101,8 +114,8 @@ def overlay(ax,
         if idf in dDecos:
             dDeco = dDecos[idf]
         else:
-            dDeco = {}
-    
+            dDeco = {}        
+
         pframe = plot(axs=[ax], 
                       dframe=dframe, 
                       xval=xval, 
@@ -110,7 +123,29 @@ def overlay(ax,
                       brange=brange, 
                       yvals=[yval], 
                       style = dStyle,
-                      decos=dDeco)
+                      decos=dDeco,
+                      labelx = rAx is None)
+        
+        if idf == 0 :
+            lframe = pframe
+
+        # plot the ratio plot
+        if rAx is not None and idf > 0:
+            rvals = pframe[yval] / lframe[yval]
+            rAx.errorbar(x=lframe[xval], 
+                              y=rvals,
+                              yerr=np.abs(pframe[yval + "_err"] / lframe[yval]),
+                              xerr=lframe[xval + "_err"],
+                              label=yval,
+                              color = dStyle.get_color(), 
+                              fmt = dStyle.get_marker(), 
+                              linewidth = dStyle.get_linewidth(), 
+                              alpha = dStyle.get_alpha())
+            rAx.set_xlabel(xval)
+            rAx.set_ylabel("Ratio")
+            rAx.axhline(1, color='black', linewidth=0.5)
+            rAx.set_ylim(0.9*np.min(rvals),1.1*np.max(rvals))
+            rAx.set_xlim(brange[0], brange[1])
 
     pass
 
