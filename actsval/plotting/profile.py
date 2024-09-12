@@ -1,5 +1,8 @@
+""" This module provides a function to plot a profile plot and their ratios
 
-#!/usr/bin/env python3
+    It also allows for decorations such as range plots and scatter plots as
+    shown in underlying patterns.
+"""
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,13 +10,14 @@ from plotting import style
 
 def plot(axs: list,
          dframe: pd.DataFrame,
-         xval: str, bins: int, brange: list, 
-         yvals: list, 
+         xval: str, bins: int, brange: list,
+         yvals: list,
          style: style = style.style(),
          decos: list = [],
          legend: bool = False,
          labelx: bool = True,
          labely: bool = True) -> pd.DataFrame:
+    """ Plot a profile plot """
 
     # Check axes versus yval length
     if len(axs) != len(yvals):
@@ -46,30 +50,30 @@ def plot(axs: list,
             rstyle = decos["range"]
             y_min_max = dframe_binned[yval].agg(["min", "max"])
             ax.fill_between(y_binned["bin_center"],
-                            y_min_max["min"], 
+                            y_min_max["min"],
                             y_min_max["max"],
-                            alpha=rstyle.get_alpha(), 
+                            alpha=rstyle.get_alpha(),
                             color=rstyle.get_color(),
                             linewidth = rstyle.get_linewidth())
 
         # decorate with scatter
         if "scatter" in decos:
             sstyle = decos["scatter"]
-            ax.scatter(dframe[xval], 
-                       dframe[yval], 
-                       alpha=sstyle.get_alpha(), 
+            ax.scatter(dframe[xval],
+                       dframe[yval],
+                       alpha=sstyle.get_alpha(),
                        color=sstyle.get_color(),
                        marker = sstyle.get_marker(),
                        linewidth = sstyle.get_linewidth())
 
         # plot as errorbar
-        ax.errorbar(x=y_binned["bin_center"], 
+        ax.errorbar(x=y_binned["bin_center"],
                     y=y_binned["mean"],
-                    yerr=np.abs(y_binned["sem"]), 
+                    yerr=np.abs(y_binned["sem"]),
                     xerr=y_binned["xerr"],
                     label=yval,
-                    color = style.get_color(), 
-                    fmt = style.get_marker(), 
+                    color = style.get_color(),
+                    fmt = style.get_marker(),
                     alpha = style.get_alpha())
         if labelx:
             ax.set_xlabel(xval)
@@ -78,7 +82,7 @@ def plot(axs: list,
 
         if legend:
             ax.legend()
-    
+
     return dframe_r
 
 
@@ -94,16 +98,17 @@ def plot(axs: list,
 # dDecos: the decorations for each frame
 # rAx: the axis for the ratio plot
 #
-def overlay(ax, 
+def overlay(ax,
             dframes,
-            xval : str, 
-            yval : str, 
-            bins : int, 
+            xval : str,
+            yval : str,
+            bins : int,
             brange : list,
             dStyles = {},
             dDecos = {},
             rAx = None) :
-    
+    """ Overlay profile plots, eventually with ratio """
+
     for idf, (dframe, dStyle) in enumerate(zip(dframes, dStyles)):
         # set the style
         if idf in dStyles:
@@ -114,32 +119,32 @@ def overlay(ax,
         if idf in dDecos:
             dDeco = dDecos[idf]
         else:
-            dDeco = {}        
+            dDeco = {}
 
-        pframe = plot(axs=[ax], 
-                      dframe=dframe, 
-                      xval=xval, 
-                      bins=bins, 
-                      brange=brange, 
-                      yvals=[yval], 
+        pframe = plot(axs=[ax],
+                      dframe=dframe,
+                      xval=xval,
+                      bins=bins,
+                      brange=brange,
+                      yvals=[yval],
                       style = dStyle,
                       decos=dDeco,
                       labelx = rAx is None)
-        
+
         if idf == 0 :
             lframe = pframe
 
         # plot the ratio plot
         if rAx is not None and idf > 0:
             rvals = pframe[yval] / lframe[yval]
-            rAx.errorbar(x=lframe[xval], 
+            rAx.errorbar(x=lframe[xval],
                               y=rvals,
                               yerr=np.abs(pframe[yval + "_err"] / lframe[yval]),
                               xerr=lframe[xval + "_err"],
                               label=yval,
-                              color = dStyle.get_color(), 
-                              fmt = dStyle.get_marker(), 
-                              linewidth = dStyle.get_linewidth(), 
+                              color = dStyle.get_color(),
+                              fmt = dStyle.get_marker(),
+                              linewidth = dStyle.get_linewidth(),
                               alpha = dStyle.get_alpha())
             rAx.set_xlabel(xval)
             rAx.set_ylabel("Ratio")
@@ -149,4 +154,4 @@ def overlay(ax,
 
     pass
 
-     
+
