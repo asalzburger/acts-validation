@@ -7,7 +7,7 @@ class style :
                        marker = None, 
                        markersize = None,
                        linestyle = None, 
-                       linewidth = None, 
+                       linewidth = 1., 
                        alpha = None) -> None:
         self.color = color
         self.marker = marker
