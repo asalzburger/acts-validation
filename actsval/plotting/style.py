@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-
-# The style class is a collection of matplotlib styles
+""" This module provides a style class defintion for matplotlib styles"""
 class style :
     """ A collection of matplotlib styles """
     def __init__(self, color = None,

@@ -16,7 +16,7 @@ def plot(
     brange: list,
     yvals: list,
     pstyle: style.style = style.style(),
-    decos: list = [],
+    decos: list = None,
     legend: bool = False,
     labelx: bool = True,
     labely: bool = True,
@@ -50,7 +50,7 @@ def plot(
         dframe_r[yval + "_err"] = y_binned["sem"]
 
         # decorate with range
-        if "range" in decos:
+        if decos is not None and "range" in decos:
             rstyle = decos["range"]
             y_min_max = dframe_binned[yval].agg(["min", "max"])
             ax.fill_between(
@@ -63,7 +63,7 @@ def plot(
             )
 
         # decorate with scatter
-        if "scatter" in decos:
+        if decos is not None and "scatter" in decos:
             sstyle = decos["scatter"]
             ax.scatter(
                 x = dframe[xval],

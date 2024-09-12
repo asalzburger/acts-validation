@@ -7,28 +7,28 @@ import pandas as pd
 from plotting import profile
 from plotting import style
 
-ntests = 100000
+N_TESTS = 100000
 brange = (-10, 10 )
-xvals = np.random.uniform(brange[0], brange[1], ntests)
+xvals = np.random.uniform(brange[0], brange[1], N_TESTS)
 
-def generateData(noise_level = 10, offset = 2) :
+def generate_data(noise_level = 10, offset = 2) :
     """ This method generates random test data for the unit tests"""
 
     # generate some random data
-    noise = np.random.normal(0, noise_level, ntests)
+    noise = np.random.normal(0, noise_level, N_TESTS)
     yvals = [ x**2 for x in xvals ]
     yvals = yvals + noise
-    noise = np.random.normal(0, noise_level, ntests)
+    noise = np.random.normal(0, noise_level, N_TESTS)
     zvals = [ (x**2 + offset) for x in xvals ]
     zvals = zvals + noise
     bdata = pd.DataFrame({'x': xvals, 'y': yvals, 'z': zvals})
     return bdata
 
-stdata = generateData(5)
-dtdata = generateData(25)
-rtdata = generateData(5)
+stdata = generate_data(5)
+dtdata = generate_data(25)
+rtdata = generate_data(5)
 
-class test_profiles(unittest.TestCase):
+class TestProfiles(unittest.TestCase):
     """ Test the profile plotting with a TestCase class """
 
     # Test a single profile plot
