@@ -75,7 +75,10 @@ for i, (input_file, color) in enumerate(zip(args.input, args.color)):
         dDecos[i] = decos
 
 # Eta plots
-fig_eta, axs_eta = plt.subplots(2, 1, figsize=args.figsize, sharex=True, gridspec_kw={'height_ratios': [2, 1]})
+fig_eta, axs_eta = plt.subplots(2, 1,
+                                figsize=args.figsize,
+                                sharex=True,
+                                gridspec_kw={'height_ratios': [2, 1]})
 fig_eta.subplots_adjust(hspace=0.05)
 
 profile.overlay(ax=axs_eta[0],
