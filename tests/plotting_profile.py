@@ -52,7 +52,7 @@ class test_profiles(unittest.TestCase):
                      brange=brange,
                      yvals=['y'],
                      axs= [ax],
-                     style = style.style(color='red'))
+                     pstyle = style.style(color='red'))
         fig.savefig('test_profile_single_red.png')
         pass
 
@@ -124,9 +124,9 @@ class test_profiles(unittest.TestCase):
                         yval = 'y',
                         bins=50,
                         brange=brange,
-                        dStyles = { 0 : style.style(color='red'),
+                        dstyles = { 0 : style.style(color='red'),
                                     1 : style.style(color='blue')},
-                        dDecos = { 0 : {'range' : style.style(color='red', alpha=0.1)},
+                        ddecos = { 0 : {'range' : style.style(color='red', alpha=0.1)},
                                    1 : {'range' : style.style(color='blue', alpha=0.1)}})
         fig.savefig('test_profile_two_overlaid.png')
         pass
@@ -142,15 +142,13 @@ class test_profiles(unittest.TestCase):
                         yval = 'y',
                         bins=50,
                         brange=brange,
-                        dStyles = { 0 : style.style(color='red'),
+                        dstyles = { 0 : style.style(color='red'),
                                     1 : style.style(color='blue')},
-                        dDecos = { 0 : {'range' : style.style(color='red', alpha=0.1)},
+                        ddecos = { 0 : {'range' : style.style(color='red', alpha=0.1)},
                                    1 : {'range' : style.style(color='blue', alpha=0.1)}},
-                        rAx = axs[1])
+                        rax = axs[1])
         fig.savefig('test_profile_two_overlaid_ratio.png')
         pass
-
-
 
 if __name__ == '__main__':
     unittest.main()

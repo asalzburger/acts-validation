@@ -4,7 +4,7 @@
 class style :
     """ A collection of matplotlib styles """
     def __init__(self, color = None,
-                       marker = None,
+                       marker = "o",
                        markersize = None,
                        linestyle = None,
                        linewidth = 1.,
