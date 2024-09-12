@@ -1,5 +1,5 @@
 """ This module provides a style class defintion for matplotlib styles"""
-class style :
+class Style :
     """ A collection of matplotlib styles """
     def __init__(self, color = None,
                        marker = "o",

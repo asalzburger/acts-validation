@@ -70,13 +70,13 @@ for i, (input_file, color) in enumerate(zip(args.input, args.color)):
     df = pd.DataFrame({"v_eta" : urf["v_eta"].array(library="np"),
                        "t_X0" : urf["t_X0"].array(library="np")})
     dframes.append(df)
-    dstyles[i] = style.style(color=color, marker=args.marker[i])
+    dstyles[i] = style.Style(color=color, marker=args.marker[i])
     decos = {}
     for d in args.decorators:
         if d == "range":
-            decos[d] = style.style(alpha=0.2, color=color)
+            decos[d] = style.Style(alpha=0.2, color=color)
         elif d == "scatter":
-            decos[d] = style.style(alpha=0.1, color=color)
+            decos[d] = style.Style(alpha=0.1, color=color)
     if len(decos) > 0:
         ddecos[i] = decos
 

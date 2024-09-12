@@ -15,7 +15,7 @@ def plot(
     bins: int,
     brange: list,
     yvals: list,
-    pstyle: style.style = style.style(),
+    pstyle: style.Style = style.Style(),
     decos: list = None,
     legend: bool = False,
     labelx: bool = True,
@@ -128,7 +128,7 @@ def overlay(
         if dstyles is not None and idf in dstyles:
             dstyle = dstyles[idf]
         else:
-            dstyle = style.style()
+            dstyle = style.Style()
         # set the decoration
         if ddecos is not None and idf in ddecos:
             ddeco = ddecos[idf]

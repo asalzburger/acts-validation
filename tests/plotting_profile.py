@@ -1,3 +1,4 @@
+""" Unit test for profile plotting"""
 #!/usr/bin/env python3
 import unittest
 import numpy as np
@@ -55,7 +56,7 @@ class TestProfiles(unittest.TestCase):
                      brange=brange,
                      yvals=['y'],
                      axs= [ax],
-                     pstyle = style.style(color='red'))
+                     pstyle = style.Style(color='red'))
         fig.savefig('test_profile_single_red.png')
 
     # Test a single profile plot with range
@@ -69,7 +70,7 @@ class TestProfiles(unittest.TestCase):
                      brange=brange,
                      yvals=['y'],
                      axs= [ax],
-                     decos={'range' : style.style(color='green', alpha=0.2)})
+                     decos={'range' : style.Style(color='green', alpha=0.2)})
         fig.savefig('test_profile_single_range.png')
 
     # Test a single profile plot with scatter
@@ -83,7 +84,7 @@ class TestProfiles(unittest.TestCase):
                      brange=brange,
                      yvals=['y'],
                      axs= [ax],
-                     decos={'scatter': style.style(color='red', marker='.', alpha=0.1)})
+                     decos={'scatter': style.Style(color='red', marker='.', alpha=0.1)})
         fig.savefig('test_profile_single_scatter.png')
 
     # Test a single profile plot with scatter
@@ -98,8 +99,8 @@ class TestProfiles(unittest.TestCase):
                      yvals=['y'],
                      axs= [ax],
                      decos={
-                         'range': style.style(color='green', alpha=0.2),
-                         'scatter': style.style(color='red', marker='.', alpha=0.1)})
+                         'range': style.Style(color='green', alpha=0.2),
+                         'scatter': style.Style(color='red', marker='.', alpha=0.1)})
         fig.savefig('test_profile_single_range_scatter.png')
 
     # Test a two profile plots
@@ -126,10 +127,10 @@ class TestProfiles(unittest.TestCase):
                         yval = 'y',
                         bins=50,
                         brange=brange,
-                        dstyles = { 0 : style.style(color='red'),
-                                    1 : style.style(color='blue')},
-                        ddecos = { 0 : {'range' : style.style(color='red', alpha=0.1)},
-                                   1 : {'range' : style.style(color='blue', alpha=0.1)}})
+                        dstyles = { 0 : style.Style(color='red'),
+                                    1 : style.Style(color='blue')},
+                        ddecos = { 0 : {'range' : style.Style(color='red', alpha=0.1)},
+                                   1 : {'range' : style.Style(color='blue', alpha=0.1)}})
         fig.savefig('test_profile_two_overlaid.png')
 
      # Test ratio of two profile plots with ratio plot
@@ -145,10 +146,10 @@ class TestProfiles(unittest.TestCase):
                         yval = 'y',
                         bins=50,
                         brange=brange,
-                        dstyles = { 0 : style.style(color='red'),
-                                    1 : style.style(color='blue')},
-                        ddecos = { 0 : {'range' : style.style(color='red', alpha=0.1)},
-                                   1 : {'range' : style.style(color='blue', alpha=0.1)}},
+                        dstyles = { 0 : style.Style(color='red'),
+                                    1 : style.Style(color='blue')},
+                        ddecos = { 0 : {'range' : style.Style(color='red', alpha=0.1)},
+                                   1 : {'range' : style.Style(color='blue', alpha=0.1)}},
                         rax = axs[1])
         fig.savefig('test_profile_two_overlaid_ratio.png')
 
