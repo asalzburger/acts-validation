@@ -12,6 +12,7 @@ brange = (-10, 10 )
 xvals = np.random.uniform(brange[0], brange[1], ntests)
 
 def generateData(noise_level = 10, offset = 2) :
+    """ This method generates random test data for the unit tests"""
 
     # generate some random data
     noise = np.random.normal(0, noise_level, ntests)
@@ -28,9 +29,11 @@ dtdata = generateData(25)
 rtdata = generateData(5)
 
 class test_profiles(unittest.TestCase):
+    """ Test the profile plotting with a TestCase class """    
 
     # Test a single profile plot
     def test_profile_single(self):
+        """ This tests a single profile plot """
 
         fig, ax = plt.subplots()
         profile.plot(dframe = stdata,
@@ -44,6 +47,7 @@ class test_profiles(unittest.TestCase):
 
     # Test a single profile plot
     def test_profile_single_red(self):
+        """ This tests a single profile plot, change the color """
 
         fig, ax = plt.subplots()
         profile.plot(dframe = stdata,
@@ -58,6 +62,7 @@ class test_profiles(unittest.TestCase):
 
     # Test a single profile plot with range
     def test_profile_single_range(self):
+        """ This tests a single profile plot, with range decoration """
 
         fig, ax = plt.subplots()
         profile.plot(dframe = stdata,
@@ -72,6 +77,7 @@ class test_profiles(unittest.TestCase):
 
     # Test a single profile plot with scatter
     def test_profile_single_scatter(self):
+        """ This tests a single profile plot, with scatter decoration """
 
         fig, ax = plt.subplots()
         profile.plot(dframe = stdata,
@@ -86,6 +92,7 @@ class test_profiles(unittest.TestCase):
 
     # Test a single profile plot with scatter
     def test_profile_single_ragne_scatter(self):
+        """ This tests a single profile plot, with range & scatter decoration """
 
         fig, ax = plt.subplots()
         profile.plot(dframe = stdata,
@@ -102,6 +109,7 @@ class test_profiles(unittest.TestCase):
 
     # Test a two profile plots
     def test_profile_two_plots(self):
+        """ This tests a two profile plots, side by side """
 
         fig, axs = plt.subplots(1,2, figsize=(10,5))
         profile.plot(dframe = stdata,
@@ -116,6 +124,7 @@ class test_profiles(unittest.TestCase):
 
     # Test ratio of two profile plots
     def test_profile_two_overlaid(self):
+        """ This tests two profile plots, olverlaid """
 
         fig, ax = plt.subplots()
         profile.overlay(ax=ax,
@@ -133,6 +142,8 @@ class test_profiles(unittest.TestCase):
 
      # Test ratio of two profile plots with ratio plot
     def test_profile_two_overlaid_ratio(self):
+        """ This tests two profile plots, olverlaid and ar ratio plot """
+
         fig, axs = plt.subplots(2, 1, sharex=True, gridspec_kw={'height_ratios': [2, 1]})
         fig.subplots_adjust(hspace=0.05)
 
