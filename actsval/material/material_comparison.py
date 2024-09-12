@@ -1,12 +1,17 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import uproot
-import math
-import argparse
+#!/usr/bin/env python
+""" This script is used to compare the material budget of different material scans
 
-import plotting.style as style
-import plotting.profile as profile
+    It runs directly on the output of the Acts MaterialMapping and Validation jobs
+"""
+
+import argparse
+import math
+import uproot
+import matplotlib.pyplot as plt
+import pandas as pd
+
+from plotting import style
+from plotting import profile
 
 p = argparse.ArgumentParser()
 
@@ -55,39 +60,42 @@ args = p.parse_args()
 
 
 # Prepare the data
-dFrames = []
-dStyles = {}
-dDecos  = {}
+dframes = []
+dstyles = {}
+ddecos  = {}
 
 # Loop to load the data
 for i, (input_file, color) in enumerate(zip(args.input, args.color)):
     urf = uproot.open(input_file+":material-tracks")
     df = pd.DataFrame({"v_eta" : urf["v_eta"].array(library="np"),
                        "t_X0" : urf["t_X0"].array(library="np")})
-    dFrames.append(df)
-    dStyles[i] = style.style(color=color, marker=args.marker[i])  
+    dframes.append(df)
+    dstyles[i] = style.Style(color=color, marker=args.marker[i])
     decos = {}
     for d in args.decorators:
         if d == "range":
-            decos[d] = style.style(alpha=0.2, color=color)
+            decos[d] = style.Style(alpha=0.2, color=color)
         elif d == "scatter":
-            decos[d] = style.style(alpha=0.1, color=color)
+            decos[d] = style.Style(alpha=0.1, color=color)
     if len(decos) > 0:
-        dDecos[i] = decos
+        ddecos[i] = decos
 
 # Eta plots
-fig_eta, axs_eta = plt.subplots(2, 1, figsize=args.figsize, sharex=True, gridspec_kw={'height_ratios': [2, 1]})
+fig_eta, axs_eta = plt.subplots(2, 1,
+                                figsize=args.figsize,
+                                sharex=True,
+                                gridspec_kw={'height_ratios': [2, 1]})
 fig_eta.subplots_adjust(hspace=0.05)
 
-profile.overlay(ax=axs_eta[0], 
-                dframes=dFrames, 
-                xval='v_eta', 
-                yval='t_X0', 
-                bins=args.eta_bins, 
-                brange=args.eta_range, 
-                dStyles=dStyles,
-                dDecos=dDecos,
-                rAx=axs_eta[1])
+profile.overlay(ax=axs_eta[0],
+                dframes=dframes,
+                xval='v_eta',
+                yval='t_X0',
+                bins=args.eta_bins,
+                brange=args.eta_range,
+                dstyles=dstyles,
+                ddecos=ddecos,
+                rax=axs_eta[1])
 axs_eta[0].grid(axis="x", linestyle="dotted")
 axs_eta[1].grid(axis="x", linestyle="dotted")
 fig_eta.show()
