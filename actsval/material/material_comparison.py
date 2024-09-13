@@ -20,6 +20,11 @@ p.add_argument(
 )
 
 p.add_argument(
+    "-t", "--tree", type=str, default="material-tracks", help="Tree name of the output files"
+)
+
+\
+p.add_argument(
     "-c", "--color", nargs="+", type=str, default="", help="Colors for the different materials"
 )
 
@@ -66,7 +71,7 @@ ddecos  = {}
 
 # Loop to load the data
 for i, (input_file, color) in enumerate(zip(args.input, args.color)):
-    urf = uproot.open(input_file+":material-tracks")
+    urf = uproot.open(input_file+":"+args.tree)
     df = pd.DataFrame({"v_eta" : urf["v_eta"].array(library="np"),
                        "t_X0" : urf["t_X0"].array(library="np")})
     dframes.append(df)
