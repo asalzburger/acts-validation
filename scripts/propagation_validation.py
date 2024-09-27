@@ -51,6 +51,12 @@ def main():
         help="Convert to detray detector and run detray navigation and propagation",
     )
 
+    p.add_argument("--detray-surface-grids",
+        default=True,
+        action=argparse.BooleanOptionalAction,
+        help="Convert detray surface grids",
+    )
+
     p.add_argument(
         "--output-summary",
         action=argparse.BooleanOptionalAction,
@@ -107,8 +113,9 @@ def main():
         elif args.mode == "detray":
             # Translate the Gen2 detector to detray and compare that
             detrayOptions = acts.detray.DetrayConverter.Options()
+            detrayOptions.convertSurfaceGrids = args.detray_surface_grids
             detrayStore = acts.examples.traccc.convertDetectorHost(gContext, detector, detrayOptions)
-            propagatorImpl = acts.examples.traccc.createPropagatorHost(detrayStore)
+            propagatorImpl = acts.examples.traccc.createSlPropagatorHost(detrayStore, sterileRun)
 
     # Evoke the sequence
     rnd = acts.examples.RandomNumbers(seed=args.seed)
