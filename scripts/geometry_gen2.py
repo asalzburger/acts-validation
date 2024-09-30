@@ -97,6 +97,7 @@ def build( args : argparse.Namespace,
         gmDetectorBuilder = acts.DetectorBuilder(gmDetectorConfig, args.top_node, logLevel)
         detector = gmDetectorBuilder.construct(gContext)
         storage["GeoModelCache"] = gmFactoryCache
+        storage["GeoModelTree"] = gmTree
     else :
         print(">>> Building OpenDataDetector")
         from acts.examples.odd import getOpenDataDetectorDirectory
@@ -121,6 +122,17 @@ def build( args : argparse.Namespace,
         # Keep track of the storage
         storage["Contextors"] = contextors
         storage["DD4hepStore"] = store
+        storage["Detector"] = dd4hepDetector
+
+    # Create the hightest Tracking volume
+    storage["Volume"] = detector.cylindricalVolumeRepresentation(gContext)
+
+    surfaceByIdentifier = {}
+    for volume in detector.volumes():
+        for surface in volume.surfaces():
+            surfaceByIdentifier[surface.geometryId()] = surface
+
+    storage["SurfaceByIdentifier"] = surfaceByIdentifier
 
     return detector, storage
 
