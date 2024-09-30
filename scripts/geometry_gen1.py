@@ -12,7 +12,7 @@ def build( args : argparse.Namespace,
     from acts.examples.odd import getOpenDataDetector
     detector, trackingGeometry, decorators = getOpenDataDetector()
     storage["Detector"] = detector
-    storage["Volume"] = trackingGeometry.highestTrackingVolume()
+    storage["Volume"] = trackingGeometry.highestTrackingVolume
     storage["SurfaceByIdentifier"] = trackingGeometry.geoIdSurfaceMap()
 
     return trackingGeometry, storage

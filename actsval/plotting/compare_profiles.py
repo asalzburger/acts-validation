@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-""" This script is used to compare the material budget of different material scans
-
-    It runs directly on the output of the Acts MaterialMapping and Validation jobs
+""" This script is used to compare profiles
 """
 
 import argparse
@@ -17,6 +15,18 @@ p = argparse.ArgumentParser()
 
 p.add_argument(
     "-i", "--input", nargs="+", type=str, default="", help="Input file(s) with material tracks"
+)
+
+p.add_argument(
+    "-t", "--tree", type=str, default="", help="Input tree"
+)
+
+p.add_argument(
+    "-x", "--x-variables", nargs="+", type=str, default="", help="x values"
+)
+
+p.add_argument(
+    "-y", "--y-variables", nargs="+", type=str, default="", help="y values"
 )
 
 p.add_argument(
@@ -58,18 +68,28 @@ p.add_argument(
 args = p.parse_args()
 
 
-
 # Prepare the data
 dframes = []
 dstyles = {}
 ddecos  = {}
 
+
+
 # Loop to load the data
 for i, (input_file, color) in enumerate(zip(args.input, args.color)):
-    urf = uproot.open(input_file+":material-tracks")
-    df = pd.DataFrame({"v_eta" : urf["v_eta"].array(library="np"),
-                       "t_X0" : urf["t_X0"].array(library="np")})
+    urf = uproot.open(input_file+":"+args.tree)
+
+    ddict = {}
+    for x in args.x_variables:
+        ddict[x] = urf[x].array(library="np")
+    for y in args.y_variables:
+        ddict[y] = urf[y].array(library="np")
+
+    # Load the data as dataframe
+    df =  pd.DataFrame(ddict)
+
     dframes.append(df)
+
     dstyles[i] = style.Style(color=color, marker=args.marker[i])
     decos = {}
     for d in args.decorators:
@@ -81,21 +101,23 @@ for i, (input_file, color) in enumerate(zip(args.input, args.color)):
         ddecos[i] = decos
 
 # Eta plots
-fig_eta, axs_eta = plt.subplots(2, 1,
+for x in args.x_variables:
+    for y in args.y_variables:
+        fig_eta, axs_eta = plt.subplots(2, 1,
                                 figsize=args.figsize,
                                 sharex=True,
                                 gridspec_kw={'height_ratios': [2, 1]})
-fig_eta.subplots_adjust(hspace=0.05)
+        fig_eta.subplots_adjust(hspace=0.05)
 
-profile.overlay(ax=axs_eta[0],
+        profile.overlay(ax=axs_eta[0],
                 dframes=dframes,
-                xval='v_eta',
-                yval='t_X0',
+                xval=x,
+                yval=y,
                 bins=args.eta_bins,
                 brange=args.eta_range,
                 dstyles=dstyles,
                 ddecos=ddecos,
                 rax=axs_eta[1])
-axs_eta[0].grid(axis="x", linestyle="dotted")
-axs_eta[1].grid(axis="x", linestyle="dotted")
-fig_eta.show()
+        axs_eta[0].grid(axis="x", linestyle="dotted")
+        axs_eta[1].grid(axis="x", linestyle="dotted")
+        fig_eta.show()
