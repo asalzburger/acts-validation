@@ -129,8 +129,6 @@ def run_comparison(args: argparse.Namespace):
 # The main function
 if __name__ == "__main__":
 
-    """ Main function to run the comparison """
-
     p_args = argparse.ArgumentParser(description=__doc__)
     add_argumens(p_args)
     t_args = p_args.parse_args()
