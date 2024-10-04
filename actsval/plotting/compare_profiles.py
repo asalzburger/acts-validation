@@ -88,10 +88,8 @@ def run_comparison(args: argparse.Namespace):
         for y in args.y_variables:
             ddict[y] = urf[y].array(library="np")
 
-        # Load the data as dataframe
-        df =  pd.DataFrame(ddict)
-
-        dframes.append(df)
+        # Load the data as dataframe and append
+        dframes.append(pd.DataFrame(ddict))
 
         dstyles[i] = style.Style(color=color, marker=args.marker[i])
         decos = {}
