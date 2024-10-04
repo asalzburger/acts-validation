@@ -59,14 +59,15 @@ def add_argumens(p : argparse.ArgumentParser):
     )
 
     p.add_argument(
-         "--phi-range", nargs=2, type=float, default=(-math.pi,math.pi), help="Range of phi plottint"
+         "--phi-range", nargs=2, type=float,
+         default=(-math.pi,math.pi), help="Range of phi plottint"
     )
 
     p.add_argument(
         "-o", "--output", type=str, default="", help="Output file (core) name"
     )
 
-
+""" Body of the script, taking the main arguments"""
 def run_comparison(args: argparse.Namespace):
 
 
@@ -74,8 +75,6 @@ def run_comparison(args: argparse.Namespace):
     dframes = []
     dstyles = {}
     ddecos  = {}
-
-
 
     # Loop to load the data
     for i, (input_file, color) in enumerate(zip(args.input, args.color)):
@@ -128,8 +127,9 @@ def run_comparison(args: argparse.Namespace):
 # The main function
 if __name__ == "__main__":
 
-    p = argparse.ArgumentParser(description=__doc__)
-    add_argumens(p)
-    args = p.parse_args()
+    p_args = argparse.ArgumentParser(description=__doc__)
+    add_argumens(p_args)
+    t_args = p_args.parse_args()
 
-    run_comparison(args)
+    run_comparison(t_args)
+
