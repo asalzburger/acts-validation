@@ -3,7 +3,7 @@ from acts import examples
 import argparse
 import geometry_gen2
 import geometry_gen1
-
+import geometry_utils
 
 def main():
     p = argparse.ArgumentParser()
@@ -19,9 +19,28 @@ def main():
     )
 
     p.add_argument("--material-surfaces-only",
-        default=True,
+        default=False,
         action=argparse.BooleanOptionalAction,
         help="Plot only material surfaces",
+    )
+
+    p.add_argument("--material-info-title-size",
+        default=48,
+        type=int,
+        help="Size of the title of the material info box",
+    )
+
+    p.add_argument("--material-info-body-size",
+        default=36,
+        type=int,
+        help="Size of the body of the material info box",
+    )
+
+    p.add_argument("--material-info-pos",
+        default=(200,200),
+        nargs=2,
+        type=int,
+        help="Position of the material info box",
     )
 
     p.add_argument(
@@ -207,10 +226,20 @@ def main():
     if materialSurfaces is not None:
         print(">>> Drawing the material surfaces only")
 
+        # Make an list of surface geometry id tags
+        surfaceTags = [ geometry_utils.geometry_id2str(
+                                surface.geometryId(),
+                                ["volume", "layer", "portal", "passive"],
+                                3)
+                        for surface in materialSurfaces ]
+
         # Check drawing the material surfaces
         surfaceStyle = acts.svg.Style()
         surfaceStyle.fillColor = args.surface_rgb
         surfaceStyle.fillOpacity = args.surface_opacity
+        surfaceStyle.strokeWidth = 5
+        surfaceStyle.highlightStrokeWidth = 10
+        surfaceStyle.highlightStrokeColor = [0, 0, 255]
 
         surfaceOptions = acts.svg.SurfaceOptions()
         surfaceOptions.style = surfaceStyle
@@ -220,11 +249,15 @@ def main():
                                                           surfaceOptions)
                                   for surface in materialSurfaces ]
 
-        materialSurfaces = [ acts.svg.viewSurface(pSurface, "material_surface_"+str(ip), "zr")
+        materialSurfacesZr = [ acts.svg.viewSurface(pSurface, "material_surface_"+surfaceTags[ip], "zr")
                              for ip, pSurface in enumerate(protoMaterialSurfaces) ]
 
+        zrFile = acts.svg.file()
+        zrFile.addObjects(materialSurfacesZr)
 
-        materialEtaLines = acts.svg.drawEtaLines("eta_lines",
+        # Draw the eta lines
+        if len(args.eta_main_lines) > 0:
+            materialEtaLines = acts.svg.drawEtaLines("eta_lines",
                                             args.eta_z_max, args.eta_r_max,
                                             args.eta_main_lines,
                                             args.eta_main_stroke_width,
@@ -233,9 +266,32 @@ def main():
                                             args.eta_sub_stroke_width,
                                             args.eta_sub_stroke_dash,
                                             10, False)
-        zrFile = acts.svg.file()
-        zrFile.addObjects(materialSurfaces)
-        zrFile.addObject(materialEtaLines)
+            zrFile.addObject(materialEtaLines)
+
+        # Connect info boxes with the information of the surface
+        for ims, mSurface in enumerate(materialSurfaces):
+            tText = surfaceTags[ims]
+            sMaterial = mSurface.surfaceMaterial()
+            if type(sMaterial) in [acts.ProtoSurfaceMaterial, acts.ProtoGridSurfaceMaterial]:
+                bText =  sMaterial.toString()
+                # split the text at new lines
+                bTextMultiLine = bText.split("\n")
+                tStyle = acts.svg.Style()
+                tStyle.fillColor = [0, 0, 255]
+                tStyle.fillOpacity = 1
+                tStyle.fontColor = [255, 255, 255]
+                tStyle.fontSize=args.material_info_title_size
+                bStyle = acts.svg.Style()
+                bStyle.fontSize=args.material_info_body_size
+                mInfoBox = acts.svg.drawInfoBox(
+                            args.material_info_pos[0],
+                            args.material_info_pos[1],
+                            tText, tStyle,
+                            bTextMultiLine, bStyle,
+                            materialSurfacesZr[ims],
+                            ["mousedown", "mouseup"])
+                zrFile.addObject(mInfoBox)
+
         # Clip if configured
         if len(args.rz_view_box) == 4 :
             zrFile.clip(args.rz_view_box)
