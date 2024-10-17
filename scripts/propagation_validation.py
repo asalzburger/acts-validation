@@ -68,6 +68,12 @@ def main():
     )
 
     p.add_argument(
+        "--output-material",
+        action=argparse.BooleanOptionalAction,
+        help="Write out the recorded",
+    )
+
+    p.add_argument(
         "--output-sim-hits",
         action=argparse.BooleanOptionalAction,
         help="Write out sim hits, only makes sense for Geant4",
@@ -171,6 +177,7 @@ def main():
             sterileLogger=sterileRun,
             inputTrackParameters="start_parameters",
             outputSummaryCollection="propagation_summary",
+            outputMaterialCollection="material_tracks",
         )
         s.addAlgorithm(propagationAlgorithm)
     else :
@@ -263,6 +270,18 @@ def main():
                 level=acts.logging.INFO,
                 collection="propagation_summary",
                 filePath=args.mode + "_propagation_steps.root",
+            )
+        )
+
+    # Common: Write the material
+    if args.output_material:
+        s.addWriter(
+            acts.examples.RootMaterialTrackWriter(
+                level=acts.logging.INFO,
+                inputMaterialTracks="material_tracks",
+                filePath=args.mode + "_material_tracks.root",
+                storeSurface=False,
+                storeVolume=False,
             )
         )
 
