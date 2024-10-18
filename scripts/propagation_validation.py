@@ -70,6 +70,12 @@ def main():
     )
 
     p.add_argument(
+        "--output-material",
+        action=argparse.BooleanOptionalAction,
+        help="Write out the recorded",
+    )
+
+    p.add_argument(
         "--output-sim-hits",
         action=argparse.BooleanOptionalAction,
         help="Write out sim hits, only makes sense for Geant4",
@@ -103,7 +109,7 @@ def main():
 
     # Timing measurement is run if neither output in on
     sterileRun = False
-    if not args.output_summary and not args.output_steps:
+    if not args.output_summary and not args.output_steps and not args.output_material:
         print(">> Timing measurement is enabled, no output is written")
         sterileRun = True
 
@@ -175,6 +181,7 @@ def main():
             sterileLogger=sterileRun,
             inputTrackParameters="start_parameters",
             outputSummaryCollection="propagation_summary",
+            outputMaterialCollection="material_tracks"
         )
         s.addAlgorithm(propagationAlgorithm)
     else :
@@ -266,6 +273,19 @@ def main():
             acts.examples.RootPropagationStepsWriter(
                 level=acts.logging.INFO,
                 collection="propagation_summary",
+                filePath=prfx+args.mode + "_propagation_steps.root",
+            )
+        )
+
+    # Common: Write the material
+    if args.output_material:
+        s.addWriter(
+            acts.examples.RootMaterialTrackWriter(
+                level=acts.logging.INFO,
+                inputMaterialTracks="material_tracks",
+                filePath=oprefix+args.mode + "_material_tracks.root",
+                storeSurface=False,
+                storeVolume=False,
                 filePath=prfx+args.mode + "_propagation_steps.root",
             )
         )
