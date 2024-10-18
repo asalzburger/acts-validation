@@ -21,6 +21,8 @@ def main():
 
     p.add_argument("-i", "--input", type=str, default="", help="Input SQL file")
 
+    p.add_argument("-o", "--output", type=str, default="", help="Output prefix")
+
     p.add_argument(
         "-m", "--map", type=str, default="", help="Input file for the material map"
     )
@@ -83,6 +85,7 @@ def main():
 
     gContext = acts.GeometryContext()
     logLevel = acts.logging.INFO
+    oprefix = args.output + "_" if args.output != "" else ""
 
     # Common (to all modes): Evoke the sequence
     rnd = acts.examples.RandomNumbers(seed=args.seed)
@@ -105,7 +108,7 @@ def main():
 
     # Timing measurement is run if neither output in on
     sterileRun = False
-    if not args.output_summary and not args.output_steps:
+    if not args.output_summary and not args.output_steps and not args.output_material:
         print(">> Timing measurement is enabled, no output is written")
         sterileRun = True
 
@@ -177,7 +180,7 @@ def main():
             sterileLogger=sterileRun,
             inputTrackParameters="start_parameters",
             outputSummaryCollection="propagation_summary",
-            outputMaterialCollection="material_tracks",
+            outputMaterialCollection="material_tracks"
         )
         s.addAlgorithm(propagationAlgorithm)
     else :
@@ -250,7 +253,7 @@ def main():
                 acts.examples.RootSimHitWriter(
                     level=logLevel,
                     inputSimHits=simHits,
-                    filePath=args.mode+"_sim_hits.root"),
+                    filePath=oprefix+args.mode+"_sim_hits.root"),
             )
 
     # Common: Write the summary
@@ -259,7 +262,7 @@ def main():
             acts.examples.RootPropagationSummaryWriter(
                 level=acts.logging.INFO,
                 inputSummaryCollection="propagation_summary",
-                filePath=args.mode + "_propagation_summary.root",
+                filePath=oprefix+args.mode + "_propagation_summary.root",
             )
         )
 
@@ -269,7 +272,7 @@ def main():
             acts.examples.RootPropagationStepsWriter(
                 level=acts.logging.INFO,
                 collection="propagation_summary",
-                filePath=args.mode + "_propagation_steps.root",
+                filePath=oprefix+args.mode + "_propagation_steps.root",
             )
         )
 
@@ -279,7 +282,7 @@ def main():
             acts.examples.RootMaterialTrackWriter(
                 level=acts.logging.INFO,
                 inputMaterialTracks="material_tracks",
-                filePath=args.mode + "_material_tracks.root",
+                filePath=oprefix+args.mode + "_material_tracks.root",
                 storeSurface=False,
                 storeVolume=False,
             )
