@@ -83,9 +83,10 @@ def main():
 
     args = p.parse_args()
 
+    prfx = args.output + "_" if args.output != "" else ""
+
     gContext = acts.GeometryContext()
     logLevel = acts.logging.INFO
-    oprefix = args.output + "_" if args.output != "" else ""
 
     # Common (to all modes): Evoke the sequence
     rnd = acts.examples.RandomNumbers(seed=args.seed)
@@ -253,7 +254,7 @@ def main():
                 acts.examples.RootSimHitWriter(
                     level=logLevel,
                     inputSimHits=simHits,
-                    filePath=oprefix+args.mode+"_sim_hits.root"),
+                    filePath=prfx+args.mode+"_sim_hits.root"),
             )
 
     # Common: Write the summary
@@ -262,7 +263,7 @@ def main():
             acts.examples.RootPropagationSummaryWriter(
                 level=acts.logging.INFO,
                 inputSummaryCollection="propagation_summary",
-                filePath=oprefix+args.mode + "_propagation_summary.root",
+                filePath=prfx+args.mode + "_propagation_summary.root",
             )
         )
 
@@ -272,7 +273,7 @@ def main():
             acts.examples.RootPropagationStepsWriter(
                 level=acts.logging.INFO,
                 collection="propagation_summary",
-                filePath=oprefix+args.mode + "_propagation_steps.root",
+                filePath=prfx+args.mode + "_propagation_steps.root",
             )
         )
 
@@ -285,6 +286,7 @@ def main():
                 filePath=oprefix+args.mode + "_material_tracks.root",
                 storeSurface=False,
                 storeVolume=False,
+                filePath=prfx+args.mode + "_propagation_steps.root",
             )
         )
 

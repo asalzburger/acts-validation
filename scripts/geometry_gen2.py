@@ -114,10 +114,9 @@ def build( args : argparse.Namespace,
         dd4hepGeometryService = acts_dd4hep.DD4hepGeometryService(dd4hepConfig)
         dd4hepDetector = acts_dd4hep.DD4hepDetector(dd4hepGeometryService)
 
-        cOptions = acts_dd4hep.DD4hepDetectorOptions(
-            logLevel=acts.logging.INFO, emulateToGraph=""
-        )
-        cOptions.materialDecorator = materialDecorator
+        cOptions = acts_dd4hep.DD4hepDetectorOptions(logLevel=acts.logging.INFO,
+                                                     emulateToGraph="",
+                                                     materialDecorator=materialDecorator)
 
         # Context and options
         geoContext = acts.GeometryContext()
