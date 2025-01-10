@@ -61,12 +61,12 @@ def main():
     # Add Gen2 related arguments
     geometry_gen2.add_arguments(p)
 
-    # The modes are
+    # The geometry modes are
     # gen1: Gen1 detector
     # gen2: Gen2 detector
     # detray_gen2: Gen2 detector converted to detray
     p.add_argument(
-        "--mode",
+        "--geo-mode",
         type=str,
         default="gen2",
         choices=["gen1", "gen2", "detray_gen2" ],
