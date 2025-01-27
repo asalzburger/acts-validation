@@ -113,7 +113,9 @@ def main():
     elif args.input.endswith(".gdml"):
         detector = acts.examples.geant4.GdmlDetector(path=args.input)
     elif args.input.endswith(".sqlite") or args.input.endswith(".db"):
-        detector = acts.examples.GeoModelDetector(path=args.input)
+        geoModelCfg = acts.geomodel.GeoModelDetector.Config()
+        geoModelCfg.path = args.input
+        detector = acts.geomodel.GeoModelDetector(geoModelCfg)
 
     runMaterialRecording(
         detector=detector,
