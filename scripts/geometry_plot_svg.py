@@ -61,12 +61,12 @@ def main():
     # Add Gen2 related arguments
     geometry_gen2.add_arguments(p)
 
-    # The modes are
+    # The geometry modes are
     # gen1: Gen1 detector
     # gen2: Gen2 detector
     # detray_gen2: Gen2 detector converted to detray
     p.add_argument(
-        "--mode",
+        "--geo-mode",
         type=str,
         default="gen2",
         choices=["gen1", "gen2", "detray_gen2" ],
@@ -153,7 +153,7 @@ def main():
     actsGeometry = None
     detectorStore = {}
     materialSurfaces = None
-    if "gen1" in args.mode:
+    if "gen1" in args.geo_mode:
         print(">>> Building the detector for Gen1")
         # Build the detector for Gen1
         actsGeometry, detectorStore = geometry_gen1.build(args, gContext, logLevel, materialDecorator)
@@ -166,7 +166,7 @@ def main():
         else :
             materialSurfaces = actsGeometry.extractMaterialSurfaces()
 
-    elif "gen2" in args.mode:
+    elif "gen2" in args.geo_mode:
         print(">>> Building the detector for Gen2")
         # Build the detector for Gen2 (also detray)
         actsGeometry, detectorStore = geometry_gen2.build(args, gContext, logLevel, materialDecorator)
@@ -179,12 +179,13 @@ def main():
             surfaceOptions = acts.svg.SurfaceOptions()
             surfaceOptions.style = surfaceStyle
 
-            viewRange = acts.Extent([])
+            viewRange = acts.Extent(acts.ExtentEnvelope())
             volumeOptions = acts.svg.DetectorVolumeOptions()
             volumeOptions.surfaceOptions = surfaceOptions
 
             # X-y view
-            xyRange = acts.Extent([[acts.BinningValue.binZ, [-50, 50]]])
+            xyRange = acts.Extent(acts.ExtentEnvelope())
+            xyRange.setRange(acts.AxisDirection.AxisX, [-50, 50])
             xyView = acts.svg.drawDetector(
                 gContext,
                 actsGeometry,
@@ -193,7 +194,8 @@ def main():
                 [["xy", ["sensitives"], xyRange]])
 
             # ZR view
-            zrRange = acts.Extent([[acts.BinningValue.binPhi, [-0.1, 0.1]]])
+            zrRange = acts.Extent(acts.ExtentEnvelope())
+            zrRange.setRange(acts.AxisDirection.AxisPhi, [-0.1, 0.1])
             zrView = acts.svg.drawDetector(
                 gContext,
                 actsGeometry,

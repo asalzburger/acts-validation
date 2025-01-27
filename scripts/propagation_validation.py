@@ -37,14 +37,14 @@ def main():
     # Add Particle generation related arguments
     particle_generation.add_arguments(p)
 
-    # The modes are
+    # The geometry modes are
     # gen1: Gen1 detector with Gen1 navigator and propagator
     # gen2: Gen2 detector with Gen2 navigator and propagator
     # detray_gen2: Gen2 detector with detray navigator and propagator
     # geant4_gen1: Geant4 navigator and propagator with gen1 surface matching
     # geant4_gen2: Geant4 navigator and propagator with gen2 surface matching
     p.add_argument(
-        "--mode",
+        "--geo-mode",
         type=str,
         default="gen2",
         choices=["gen1", "gen2", "detray_gen2", "geant4_gen1", "geant4_gen2"],
