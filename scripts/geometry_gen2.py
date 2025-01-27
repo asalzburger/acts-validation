@@ -65,7 +65,7 @@ def build( args : argparse.Namespace,
         # Construct the building hierarchy
         gmBlueprintConfig = gm.GeoModelBlueprintCreater.Config()
         gmBlueprintConfig.detectorSurfaces = gmSurfaces
-        gmBlueprintConfig.kdtBinning = [acts.BinningValue.binZ, acts.BinningValue.binR]
+        gmBlueprintConfig.kdtBinning = [acts.AxisDirection.AxisZ, acts.AxisDirection.AxisR]
 
         gmBlueprintOptions = gm.GeoModelBlueprintCreater.Options()
         gmBlueprintOptions.table = args.table_name
