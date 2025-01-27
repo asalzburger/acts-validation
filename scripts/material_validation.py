@@ -69,10 +69,10 @@ def main():
     # Build the acts geometry
     actsGeometry = None
     detectorStore = {}
-    if "gen1" in args.mode:
+    if "gen1" in args.geo_mode:
         # Build the detector for Gen1
         actsGeometry, detectorStore = geometry_gen1.build(args, gContext, logLevel, materialDecorator)
-    elif "gen2" in args.mode:
+    elif "gen2" in args.geo_mode:
         # Build the detector for Gen2 (also detray)
         actsGeometry, detectorStore = geometry_gen2.build(args, gContext, logLevel, materialDecorator)
 
@@ -100,7 +100,7 @@ def main():
         acts.examples.RootMaterialTrackWriter(
             level=acts.logging.INFO,
             inputMaterialTracks=materialValidationConfig.outputMaterialTracks,
-            filePath=args.mode + "_material_tracks.root",
+            filePath=args.geo_mode + "_material_tracks.root",
             storeSurface=True,
             storeVolume=True,
         )
