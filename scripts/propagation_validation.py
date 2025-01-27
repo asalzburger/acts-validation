@@ -122,30 +122,30 @@ def main():
     # Build the acts geometry
     actsGeometry = None
     detectorStore = {}
-    if "gen1" in args.mode:
+    if "gen1" in args.geo_mode:
         # Build the detector for Gen1
         actsGeometry, detectorStore = geometry_gen1.build(args, gContext, logLevel, materialDecorator)
-    elif "gen2" in args.mode:
+    elif "gen2" in args.geo_mode:
         # Build the detector for Gen2 (also detray)
         actsGeometry, detectorStore = geometry_gen2.build(args, gContext, logLevel, materialDecorator)
 
 
     # Check the mode
-    print(">>> Test mode is :", args.mode)
+    print(">>> Test mode is :", args.geo_mode)
     # check if the mode does not contain geant4
-    if not "geant4" in args.mode:
+    if not "geant4" in args.geo_mode:
         # The propagator
         propagatorImpl = None
         stepper = acts.StraightLineStepper()
 
         # Build the detector for Gen1
-        if args.mode == "gen1":
+        if args.geo_mode == "gen1":
             # Set up the navigator - Gen1
             navigator = acts.Navigator(trackingGeometry=actsGeometry)
             propagator = acts.Propagator(stepper, navigator)
             propagatorImpl = acts.examples.ConcretePropagator(propagator)
         else:
-            if args.mode == "gen2":
+            if args.geo_mode == "gen2":
                 # Set up the navigator - Gen2
                 navigatorConfig = acts.DetectorNavigator.Config()
                 navigatorConfig.detector = actsGeometry
@@ -154,7 +154,7 @@ def main():
                 # And finally the propagtor implementation
                 propagatorImpl = acts.examples.ConcretePropagator(propagator)
 
-            elif args.mode == "detray_gen2":
+            elif args.geo_mode == "detray_gen2":
                 # Translate the Gen2 detector to detray and compare that
                 detrayOptions = acts.detray.DetrayConverter.Options()
                 detrayOptions.convertSurfaceGrids = args.detray_surface_grids
@@ -254,7 +254,7 @@ def main():
                 acts.examples.RootSimHitWriter(
                     level=logLevel,
                     inputSimHits=simHits,
-                    filePath=prfx+args.mode+"_sim_hits.root"),
+                    filePath=prfx+args.geo_mode+"_sim_hits.root"),
             )
 
     # Common: Write the summary
@@ -263,7 +263,7 @@ def main():
             acts.examples.RootPropagationSummaryWriter(
                 level=acts.logging.INFO,
                 inputSummaryCollection="propagation_summary",
-                filePath=prfx+args.mode + "_propagation_summary.root",
+                filePath=prfx+args.geo_mode + "_propagation_summary.root",
             )
         )
 
@@ -273,7 +273,7 @@ def main():
             acts.examples.RootPropagationStepsWriter(
                 level=acts.logging.INFO,
                 collection="propagation_summary",
-                filePath=prfx+args.mode + "_propagation_steps.root",
+                filePath=prfx+args.geo_mode + "_propagation_steps.root",
             )
         )
 
@@ -283,10 +283,9 @@ def main():
             acts.examples.RootMaterialTrackWriter(
                 level=acts.logging.INFO,
                 inputMaterialTracks="material_tracks",
-                filePath=oprefix+args.mode + "_material_tracks.root",
+                filePath=oprefix+args.geo_mode + "_material_tracks.root",
                 storeSurface=False,
                 storeVolume=False,
-                filePath=prfx+args.mode + "_propagation_steps.root",
             )
         )
 
