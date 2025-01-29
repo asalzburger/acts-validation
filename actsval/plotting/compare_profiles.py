@@ -171,6 +171,9 @@ def run_comparison(args: argparse.Namespace):
             axs[1].set_xlabel(xlabel[ix], fontsize=args.x_label_size)
             axs[1].set_ylabel("Ratio", fontsize=args.y_label_size)
             fig.show()
+            fig.savefig(args.output + "_" + x + "_vs_" + y + ".png")
+            fig.savefig(args.output + "_" + x + "_vs_" + y + ".svg")
+            
 
 
 # The main function
