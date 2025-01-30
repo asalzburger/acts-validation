@@ -21,6 +21,8 @@ def main():
 
     p.add_argument("-i", "--input", type=str, default="", help="Input SQL file")
 
+    p.add_argument("-o", "--output", type=str, default="", help="Output prefix")
+
     p.add_argument(
         "-m", "--map", type=str, default="", help="Input file for the material map"
     )
@@ -35,14 +37,14 @@ def main():
     # Add Particle generation related arguments
     particle_generation.add_arguments(p)
 
-    # The modes are
+    # The geometry modes are
     # gen1: Gen1 detector with Gen1 navigator and propagator
     # gen2: Gen2 detector with Gen2 navigator and propagator
     # detray_gen2: Gen2 detector with detray navigator and propagator
     # geant4_gen1: Geant4 navigator and propagator with gen1 surface matching
     # geant4_gen2: Geant4 navigator and propagator with gen2 surface matching
     p.add_argument(
-        "--mode",
+        "--geo-mode",
         type=str,
         default="gen2",
         choices=["gen1", "gen2", "detray_gen2", "geant4_gen1", "geant4_gen2"],
@@ -68,12 +70,20 @@ def main():
     )
 
     p.add_argument(
+        "--output-material",
+        action=argparse.BooleanOptionalAction,
+        help="Write out the recorded",
+    )
+
+    p.add_argument(
         "--output-sim-hits",
         action=argparse.BooleanOptionalAction,
         help="Write out sim hits, only makes sense for Geant4",
     )
 
     args = p.parse_args()
+
+    prfx = args.output + "_" if args.output != "" else ""
 
     gContext = acts.GeometryContext()
     logLevel = acts.logging.INFO
@@ -99,7 +109,7 @@ def main():
 
     # Timing measurement is run if neither output in on
     sterileRun = False
-    if not args.output_summary and not args.output_steps:
+    if not args.output_summary and not args.output_steps and not args.output_material:
         print(">> Timing measurement is enabled, no output is written")
         sterileRun = True
 
@@ -112,30 +122,30 @@ def main():
     # Build the acts geometry
     actsGeometry = None
     detectorStore = {}
-    if "gen1" in args.mode:
+    if "gen1" in args.geo_mode:
         # Build the detector for Gen1
         actsGeometry, detectorStore = geometry_gen1.build(args, gContext, logLevel, materialDecorator)
-    elif "gen2" in args.mode:
+    elif "gen2" in args.geo_mode:
         # Build the detector for Gen2 (also detray)
         actsGeometry, detectorStore = geometry_gen2.build(args, gContext, logLevel, materialDecorator)
 
 
     # Check the mode
-    print(">>> Test mode is :", args.mode)
+    print(">>> Test mode is :", args.geo_mode)
     # check if the mode does not contain geant4
-    if not "geant4" in args.mode:
+    if not "geant4" in args.geo_mode:
         # The propagator
         propagatorImpl = None
         stepper = acts.StraightLineStepper()
 
         # Build the detector for Gen1
-        if args.mode == "gen1":
+        if args.geo_mode == "gen1":
             # Set up the navigator - Gen1
             navigator = acts.Navigator(trackingGeometry=actsGeometry)
             propagator = acts.Propagator(stepper, navigator)
             propagatorImpl = acts.examples.ConcretePropagator(propagator)
         else:
-            if args.mode == "gen2":
+            if args.geo_mode == "gen2":
                 # Set up the navigator - Gen2
                 navigatorConfig = acts.DetectorNavigator.Config()
                 navigatorConfig.detector = actsGeometry
@@ -144,7 +154,7 @@ def main():
                 # And finally the propagtor implementation
                 propagatorImpl = acts.examples.ConcretePropagator(propagator)
 
-            elif args.mode == "detray_gen2":
+            elif args.geo_mode == "detray_gen2":
                 # Translate the Gen2 detector to detray and compare that
                 detrayOptions = acts.detray.DetrayConverter.Options()
                 detrayOptions.convertSurfaceGrids = args.detray_surface_grids
@@ -152,18 +162,12 @@ def main():
                 propagatorImpl = acts.examples.traccc.createSlPropagatorHost(detrayStore, sterileRun)
 
         # Run particle smearing
-        trackParametersGenerator = acts.examples.ParticleSmearing(
+        trkParamExtractor = acts.examples.ParticleTrackParamExtractor(
             level=acts.logging.INFO,
-            inputParticles="particles_input",
+            inputParticles="particles_generated",
             outputTrackParameters="start_parameters",
-            randomNumbers=rnd,
-            sigmaD0=0.0,
-            sigmaZ0=0.0,
-            sigmaPhi=0.0,
-            sigmaTheta=0.0,
-            sigmaPtRel=0.0,
         )
-        s.addAlgorithm(trackParametersGenerator)
+        s.addAlgorithm(trkParamExtractor)
 
         propagationAlgorithm = acts.examples.PropagationAlgorithm(
             propagatorImpl=propagatorImpl,
@@ -171,6 +175,7 @@ def main():
             sterileLogger=sterileRun,
             inputTrackParameters="start_parameters",
             outputSummaryCollection="propagation_summary",
+            outputMaterialCollection="material_tracks"
         )
         s.addAlgorithm(propagationAlgorithm)
     else :
@@ -243,7 +248,7 @@ def main():
                 acts.examples.RootSimHitWriter(
                     level=logLevel,
                     inputSimHits=simHits,
-                    filePath=args.mode+"_sim_hits.root"),
+                    filePath=prfx+args.geo_mode+"_sim_hits.root"),
             )
 
     # Common: Write the summary
@@ -252,7 +257,7 @@ def main():
             acts.examples.RootPropagationSummaryWriter(
                 level=acts.logging.INFO,
                 inputSummaryCollection="propagation_summary",
-                filePath=args.mode + "_propagation_summary.root",
+                filePath=prfx+args.geo_mode + "_propagation_summary.root",
             )
         )
 
@@ -262,7 +267,19 @@ def main():
             acts.examples.RootPropagationStepsWriter(
                 level=acts.logging.INFO,
                 collection="propagation_summary",
-                filePath=args.mode + "_propagation_steps.root",
+                filePath=prfx+args.geo_mode + "_propagation_steps.root",
+            )
+        )
+
+    # Common: Write the material
+    if args.output_material:
+        s.addWriter(
+            acts.examples.RootMaterialTrackWriter(
+                level=acts.logging.INFO,
+                inputMaterialTracks="material_tracks",
+                filePath=args.geo_mode + "_material_tracks.root",
+                storeSurface=False,
+                storeVolume=False,
             )
         )
 

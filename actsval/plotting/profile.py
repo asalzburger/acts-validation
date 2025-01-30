@@ -80,15 +80,16 @@ def plot(
             y=y_binned["mean"],
             yerr=np.abs(y_binned["sem"]),
             xerr=y_binned["xerr"],
-            label=yval,
             color=pstyle.get_color(),
             fmt=pstyle.get_marker(),
-            alpha=pstyle.get_alpha()
+            alpha=pstyle.get_alpha(),
+            label = dframe.name if dframe.name != "" else None,
         )
         if labelx:
             ax.set_xlabel(xval)
         if labely:
             ax.set_ylabel(yval)
+
 
         if legend:
             ax.legend()

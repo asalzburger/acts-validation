@@ -9,7 +9,7 @@ def add_arguments(p : argparse.ArgumentParser):
         "--queries",
         type=str,
         nargs="+",
-        default="GeoModelXML",
+        default=["ITk"],
         help="List of Queries for Published full phys volumes",
     )
 
@@ -23,7 +23,7 @@ def add_arguments(p : argparse.ArgumentParser):
     p.add_argument(
         "--top-node",
         type=str,
-        default="",
+        default="ITk",
         help="Name of the top node in the blueprint tree",
     )
 
@@ -65,7 +65,7 @@ def build( args : argparse.Namespace,
         # Construct the building hierarchy
         gmBlueprintConfig = gm.GeoModelBlueprintCreater.Config()
         gmBlueprintConfig.detectorSurfaces = gmSurfaces
-        gmBlueprintConfig.kdtBinning = [acts.BinningValue.binZ, acts.BinningValue.binR]
+        gmBlueprintConfig.kdtBinning = [acts.AxisDirection.AxisZ, acts.AxisDirection.AxisR]
 
         gmBlueprintOptions = gm.GeoModelBlueprintCreater.Options()
         gmBlueprintOptions.table = args.table_name
@@ -114,7 +114,9 @@ def build( args : argparse.Namespace,
         dd4hepGeometryService = acts_dd4hep.DD4hepGeometryService(dd4hepConfig)
         dd4hepDetector = acts_dd4hep.DD4hepDetector(dd4hepGeometryService)
 
-        cOptions = acts_dd4hep.DD4hepDetectorOptions(logLevel=acts.logging.INFO, emulateToGraph="")
+        cOptions = acts_dd4hep.DD4hepDetectorOptions(logLevel=acts.logging.INFO,
+                                                     emulateToGraph="",
+                                                     materialDecorator=materialDecorator)
 
         # Context and options
         geoContext = acts.GeometryContext()

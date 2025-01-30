@@ -10,7 +10,8 @@ def build( args : argparse.Namespace,
 
     # Build the detector for Gen1 - for the moment only ODD
     from acts.examples.odd import getOpenDataDetector
-    detector, trackingGeometry, decorators = getOpenDataDetector()
+    detector = getOpenDataDetector(None)
+    trackingGeometry = detector.trackingGeometry()
     storage["Detector"] = detector
     storage["Volume"] = trackingGeometry.highestTrackingVolume
     storage["SurfaceByIdentifier"] = trackingGeometry.geoIdSurfaceMap()
