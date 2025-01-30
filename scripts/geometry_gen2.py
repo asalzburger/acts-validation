@@ -9,7 +9,7 @@ def add_arguments(p : argparse.ArgumentParser):
         "--queries",
         type=str,
         nargs="+",
-        default="GeoModelXML",
+        default=["ITk"],
         help="List of Queries for Published full phys volumes",
     )
 
@@ -23,7 +23,7 @@ def add_arguments(p : argparse.ArgumentParser):
     p.add_argument(
         "--top-node",
         type=str,
-        default="",
+        default="ITk",
         help="Name of the top node in the blueprint tree",
     )
 
