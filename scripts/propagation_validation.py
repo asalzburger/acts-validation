@@ -98,7 +98,7 @@ def main():
     addParticleGun(
         s,
         ParticleConfig(
-            num=args.tracks, pdg=acts.PdgParticle.eInvalid, randomizeCharge=True
+            num=args.tracks, pdg=acts.PdgParticle.eMuon, randomizeCharge=True
         ),
         EtaConfig(args.eta_range[0], args.eta_range[1]),
         MomentumConfig(
