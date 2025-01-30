@@ -162,18 +162,12 @@ def main():
                 propagatorImpl = acts.examples.traccc.createSlPropagatorHost(detrayStore, sterileRun)
 
         # Run particle smearing
-        trackParametersGenerator = acts.examples.ParticleSmearing(
+        trkParamExtractor = acts.examples.ParticleTrackParamExtractor(
             level=acts.logging.INFO,
-            inputParticles="particles_input",
+            inputParticles="particles_generated",
             outputTrackParameters="start_parameters",
-            randomNumbers=rnd,
-            sigmaD0=0.0,
-            sigmaZ0=0.0,
-            sigmaPhi=0.0,
-            sigmaTheta=0.0,
-            sigmaPtRel=0.0,
         )
-        s.addAlgorithm(trackParametersGenerator)
+        s.addAlgorithm(trkParamExtractor)
 
         propagationAlgorithm = acts.examples.PropagationAlgorithm(
             propagatorImpl=propagatorImpl,
@@ -283,7 +277,7 @@ def main():
             acts.examples.RootMaterialTrackWriter(
                 level=acts.logging.INFO,
                 inputMaterialTracks="material_tracks",
-                filePath=oprefix+args.geo_mode + "_material_tracks.root",
+                filePath=args.geo_mode + "_material_tracks.root",
                 storeSurface=False,
                 storeVolume=False,
             )
