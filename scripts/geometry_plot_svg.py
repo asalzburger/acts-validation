@@ -11,8 +11,14 @@ def main():
     p.add_argument("-i", "--input", type=str, default="", help="Input SQL file")
 
     p.add_argument(
-        "-o", "--output", type=str, default="GeoModel", help="Output file(s) base name"
+        "-o", "--output", type=str, default="detector", help="Output file(s) base name"
     )
+
+    p.add_argument(
+        "--output-internals",
+        default=False,
+        action=argparse.BooleanOptionalAction,
+        help="Write out the internal objects")
 
     p.add_argument(
         "-m", "--map", type=str, default="", help="Input file for the material map"
@@ -47,15 +53,31 @@ def main():
         "--surface-rgb",
         nargs=3,
         type=int,
-        default=[5, 150, 245],
+        default=[66, 182, 245],
         help="Color RGB for surfaces",
     )
 
     p.add_argument(
         "--surface-opacity",
         type=float,
-        default=0.5,
+        default=0.75,
         help="Color RGB opacity for surfaces",
+    )
+
+    p.add_argument(
+        "--surface-highlight-rgb",
+        nargs=3,
+        type=int,
+        default=[245, 182, 66],
+        help="Color Highlight RGB for surfaces",
+    )
+
+    p.add_argument(
+        "--surface-stroke-rgb",
+        nargs=3,
+        type=int,
+        default=[33, 120, 245],
+        help="Color RGB for surface strokes",
     )
 
     # Add Gen2 related arguments
@@ -300,6 +322,36 @@ def main():
         # Write it out
         zrFile.write(args.output+"_material_surfaces_zr.svg")
 
+
+
+
+        if args.output_internals :
+
+            gridOptions = acts.svg.GridOptions()
+            gridOptions.style.fillColor = [0, 0, 0]
+            gridOptions.style.fillOpacity = 0.
+            gridOptions.style.strokeColor = [255, 0, 0]
+            gridOptions.style.strokeWidth = 1
+
+            indexedSurfacesOptions = acts.svg.IndexedSurfacesOptions()
+            indexedSurfacesOptions.gridOptions = gridOptions
+
+            volumeOptions.indexedSurfacesOptions = indexedSurfacesOptions
+
+            for ivol, volume in enumerate(detector.volumes()):
+                if len(volume.surfaces()) == 0:
+                    continue
+                else :
+                    identification = "IndexedSurfaces_vol"+str(ivol)
+                    protoVolume, protoIndexedGrid = acts.svg.convertDetectorVolume(gContext, volume, volumeOptions)
+                    xyIndexedSurfaces = acts.svg.drawIndexedSurfaces(protoIndexedGrid, identification)
+                    xyFile = acts.svg.file()
+                    xyFile.addObject(xyIndexedSurfaces)
+                    xyFile.write(args.output + "_" + identification + ".svg")
+
+                #volumeFile = acts.svg.file()
+                #volumeFile.addObjects(acts.svg.drawVolume(volume, surfaceOptions))
+                #volumeFile.write(args.output + "_" + volume.name() + ".svg")
 
 
 if "__main__" == __name__:
