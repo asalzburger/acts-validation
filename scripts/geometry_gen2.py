@@ -33,6 +33,13 @@ def add_arguments(p : argparse.ArgumentParser):
         default="",
         help="Table entry string overriding the top node bounds",
     )
+    
+    p.add_argument(
+        "--external-surfaces-json",
+        type=str,
+        default="",
+        help="External sensitive surfaces file provided by json"
+    )
 
 def build( args : argparse.Namespace,
            gContext : acts.GeometryContext,
@@ -49,25 +56,40 @@ def build( args : argparse.Namespace,
         # Read the geometry model from the database
         gmTree = acts.geomodel.readFromDb(args.input)
 
-        gmFactoryConfig = gm.GeoModelDetectorObjectFactory.Config()
-        gmFactory = gm.GeoModelDetectorObjectFactory(gmFactoryConfig, logLevel)
+        if args.external_surfaces_json == "":
+            gmFactoryConfig = gm.GeoModelDetectorObjectFactory.Config()
+            gmFactory = gm.GeoModelDetectorObjectFactory(gmFactoryConfig, logLevel)
 
-        # The options
-        gmFactoryOptions = gm.GeoModelDetectorObjectFactory.Options()
-        gmFactoryOptions.queries = args.queries
-        # The Cache & construct call
-        gmFactoryCache = gm.GeoModelDetectorObjectFactory.Cache()
-        gmFactory.construct(gmFactoryCache, gContext, gmTree, gmFactoryOptions)
+            # The options
+            gmFactoryOptions = gm.GeoModelDetectorObjectFactory.Options()
+            gmFactoryOptions.queries = args.queries
+            # The Cache & construct call
+            gmFactoryCache = gm.GeoModelDetectorObjectFactory.Cache()
+            gmFactory.construct(gmFactoryCache, gContext, gmTree, gmFactoryOptions)
 
-        # All surfaces from GeoModel
-        gmSurfaces = [ss[1] for ss in gmFactoryCache.sensitiveSurfaces]
-
+            # All surfaces from GeoModel
+            gmSurfaces = [ss[1] for ss in gmFactoryCache.sensitiveSurfaces]
+        else :
+            from acts import json
+            jsonOptions = acts.json.SurfaceJsonOptions()
+            jsonOptions.jsonEntryPath = ()
+            jsonOptions.inputFile = args.external_surfaces_json
+            gmSurfaces = acts.json.readSurfaceVectorFromJson(jsonOptions)
+            gmFactoryCache = gm.GeoModelDetectorObjectFactory.Cache()
+        
         # Construct the building hierarchy
         gmBlueprintConfig = gm.GeoModelBlueprintCreater.Config()
         gmBlueprintConfig.detectorSurfaces = gmSurfaces
         gmBlueprintConfig.kdtBinning = [acts.AxisDirection.AxisZ, acts.AxisDirection.AxisR]
 
         gmBlueprintOptions = gm.GeoModelBlueprintCreater.Options()
+        
+        # Special grid filling options
+        gmBlueprintOptions.projectedBinFilling = True
+        gmBlueprintOptions.projectionLuminousRegion = [ acts.Vector3(0.,0.,-150.), acts.Vector3(0.,0.,150.) ]
+        
+        
+        
         gmBlueprintOptions.table = args.table_name
         gmBlueprintOptions.topEntry = args.top_node
         if len(args.top_node_bounds) > 0:
@@ -132,7 +154,7 @@ def build( args : argparse.Namespace,
     surfaceByIdentifier = {}
     for volume in detector.volumes():
         for surface in volume.surfaces():
-            surfaceByIdentifier[surface.geometryId()] = surface
+            surfaceByIdentifier[surface.geometryId] = surface
 
     storage["SurfaceByIdentifier"] = surfaceByIdentifier
 
