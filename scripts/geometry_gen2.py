@@ -83,6 +83,13 @@ def build( args : argparse.Namespace,
         gmBlueprintConfig.kdtBinning = [acts.AxisDirection.AxisZ, acts.AxisDirection.AxisR]
 
         gmBlueprintOptions = gm.GeoModelBlueprintCreater.Options()
+        
+        # Special grid filling options
+        gmBlueprintOptions.projectedBinFilling = True
+        gmBlueprintOptions.projectionLuminousRegion = [ acts.Vector3(0.,0.,-150.), acts.Vector3(0.,0.,150.) ]
+        
+        
+        
         gmBlueprintOptions.table = args.table_name
         gmBlueprintOptions.topEntry = args.top_node
         if len(args.top_node_bounds) > 0:
