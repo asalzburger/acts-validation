@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-""" This script is used to compare profiles
-"""
+"""This script is used to compare profiles"""
 
 import argparse
 import math
@@ -36,11 +35,11 @@ def add_argumens(p: argparse.ArgumentParser):
 
     p.add_argument("--x-labels", nargs="+", type=str, default="", help="x labels")
 
-    p.add_argument("--x-label-size",  type=int, default=14, help="x label font size")
+    p.add_argument("--x-label-size", type=int, default=14, help="x label font size")
 
     p.add_argument("--y-labels", nargs="+", type=str, default="", help="y labels")
 
-    p.add_argument("--y-label-size",  type=int, default=14, help="y label font size")
+    p.add_argument("--y-label-size", type=int, default=14, help="y label font size")
 
     p.add_argument(
         "-c",
@@ -173,7 +172,6 @@ def run_comparison(args: argparse.Namespace):
             fig.show()
             fig.savefig(args.output + "_" + x + "_vs_" + y + ".png")
             fig.savefig(args.output + "_" + x + "_vs_" + y + ".svg")
-            
 
 
 # The main function

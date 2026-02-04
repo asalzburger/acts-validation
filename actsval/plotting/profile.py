@@ -1,12 +1,13 @@
-""" This module provides a function to plot a profile plot and their ratios
+"""This module provides a function to plot a profile plot and their ratios
 
-    It also allows for decorations such as range plots and scatter plots as
-    shown in underlying patterns.
+It also allows for decorations such as range plots and scatter plots as
+shown in underlying patterns.
 """
 
 import pandas as pd
 import numpy as np
 from plotting import style
+
 
 def plot(
     axs: list,
@@ -22,21 +23,28 @@ def plot(
     labely: bool = True,
 ) -> pd.DataFrame:
     """Plot a profile plot"""
-    
+
     if len(axs) != len(yvals):
         raise ValueError("Number of axes must match number of yvals")
 
     # Prepare the binning, add underflow and overflow bins
-    bin_ls = np.linspace(brange[0], brange[1], bins+1)
+    bin_ls = np.linspace(brange[0], brange[1], bins + 1)
     bin_centers = 0.5 * (bin_ls[:-1] + bin_ls[1:])
-    bin_centers = np.concatenate(([bin_ls[0] - (bin_ls[1] - bin_ls[0]) / 2], bin_centers, [bin_ls[-1] + (bin_ls[-1] - bin_ls[-2]) / 2]))
-        
+    bin_centers = np.concatenate(
+        (
+            [bin_ls[0] - (bin_ls[1] - bin_ls[0]) / 2],
+            bin_centers,
+            [bin_ls[-1] + (bin_ls[-1] - bin_ls[-2]) / 2],
+        )
+    )
+
     # Calculate bin widths, including underflow and overflow bins
     bin_width = (bin_ls[1:] - bin_ls[:-1]) / bins
-    bin_width = np.concatenate(([bin_ls[1] - bin_ls[0]], bin_width, [bin_ls[-1] - bin_ls[-2]]))
+    bin_width = np.concatenate(
+        ([bin_ls[1] - bin_ls[0]], bin_width, [bin_ls[-1] - bin_ls[-2]])
+    )
 
-    
-    # This will digitize with underflow - overflow bins, 
+    # This will digitize with underflow - overflow bins,
     # but we will ignore those in the plotting, so let us strip them off
     dframe["bin_idx"] = np.digitize(dframe[xval], bins=bin_ls)
 
@@ -48,7 +56,7 @@ def plot(
     dframe_r[xval + "_err"] = bin_width / 2
 
     for ax, yval in zip(axs, yvals):
-                
+
         y_binned = dframe_binned[yval].agg(["mean", "sem"])
         y_binned["bin_center"] = bin_centers
         y_binned["xerr"] = bin_width / 2
@@ -75,18 +83,18 @@ def plot(
             )
 
         # decorate with scatter
-        if decos is not None and "scatter" in decos:                        
+        if decos is not None and "scatter" in decos:
             sstyle = decos["scatter"]
             # ignore underflow and overflow bins
             ax.scatter(
-                x = dframe[xval],
-                y = dframe[yval],
+                x=dframe[xval],
+                y=dframe[yval],
                 alpha=sstyle.get_alpha(),
                 color=sstyle.get_color(),
                 marker=sstyle.get_marker(),
                 linewidth=sstyle.get_linewidth(),
             )
-            
+
         # plot as errorbar
         ax.errorbar(
             x=y_binned_p["bin_center"],
@@ -96,13 +104,12 @@ def plot(
             color=pstyle.get_color(),
             fmt=pstyle.get_marker(),
             alpha=pstyle.get_alpha(),
-            label = dframe.name if dframe.name != "" else None,
+            label=dframe.name if dframe.name != "" else None,
         )
         if labelx:
             ax.set_xlabel(xval)
         if labely:
             ax.set_ylabel(yval)
-
 
         if legend:
             ax.legend()
