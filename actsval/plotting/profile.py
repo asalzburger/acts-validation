@@ -22,16 +22,22 @@ def plot(
     labely: bool = True,
 ) -> pd.DataFrame:
     """Plot a profile plot"""
-
-    # Check axes versus yval length
+    
     if len(axs) != len(yvals):
         raise ValueError("Number of axes must match number of yvals")
 
-    # Prepare the binning
-    bin_ls = np.linspace(brange[0], brange[1], bins)
+    # Prepare the binning, add underflow and overflow bins
+    bin_ls = np.linspace(brange[0], brange[1], bins+1)
     bin_centers = 0.5 * (bin_ls[:-1] + bin_ls[1:])
+    bin_centers = np.concatenate(([bin_ls[0] - (bin_ls[1] - bin_ls[0]) / 2], bin_centers, [bin_ls[-1] + (bin_ls[-1] - bin_ls[-2]) / 2]))
+        
+    # Calculate bin widths, including underflow and overflow bins
     bin_width = (bin_ls[1:] - bin_ls[:-1]) / bins
+    bin_width = np.concatenate(([bin_ls[1] - bin_ls[0]], bin_width, [bin_ls[-1] - bin_ls[-2]]))
 
+    
+    # This will digitize with underflow - overflow bins, 
+    # but we will ignore those in the plotting, so let us strip them off
     dframe["bin_idx"] = np.digitize(dframe[xval], bins=bin_ls)
 
     # grouby bin, so we can calculate stuff
@@ -42,6 +48,7 @@ def plot(
     dframe_r[xval + "_err"] = bin_width / 2
 
     for ax, yval in zip(axs, yvals):
+                
         y_binned = dframe_binned[yval].agg(["mean", "sem"])
         y_binned["bin_center"] = bin_centers
         y_binned["xerr"] = bin_width / 2
@@ -49,22 +56,28 @@ def plot(
         dframe_r[yval] = y_binned["mean"]
         dframe_r[yval + "_err"] = y_binned["sem"]
 
+        # Generally used
+        y_binned_p = y_binned.iloc[1:-1]
+
         # decorate with range
         if decos is not None and "range" in decos:
             rstyle = decos["range"]
             y_min_max = dframe_binned[yval].agg(["min", "max"])
+            # ignore underflow and overflow bins
+            y_min_max_p = y_min_max.iloc[1:-1]
             ax.fill_between(
-                y_binned["bin_center"],
-                y_min_max["min"],
-                y_min_max["max"],
+                y_binned_p["bin_center"],
+                y_min_max_p["min"],
+                y_min_max_p["max"],
                 alpha=rstyle.get_alpha(),
                 color=rstyle.get_color(),
                 linewidth=rstyle.get_linewidth(),
             )
 
         # decorate with scatter
-        if decos is not None and "scatter" in decos:
+        if decos is not None and "scatter" in decos:                        
             sstyle = decos["scatter"]
+            # ignore underflow and overflow bins
             ax.scatter(
                 x = dframe[xval],
                 y = dframe[yval],
@@ -73,13 +86,13 @@ def plot(
                 marker=sstyle.get_marker(),
                 linewidth=sstyle.get_linewidth(),
             )
-
+            
         # plot as errorbar
         ax.errorbar(
-            x=y_binned["bin_center"],
-            y=y_binned["mean"],
-            yerr=np.abs(y_binned["sem"]),
-            xerr=y_binned["xerr"],
+            x=y_binned_p["bin_center"],
+            y=y_binned_p["mean"],
+            yerr=np.abs(y_binned_p["sem"]),
+            xerr=y_binned_p["xerr"],
             color=pstyle.get_color(),
             fmt=pstyle.get_marker(),
             alpha=pstyle.get_alpha(),
@@ -154,11 +167,12 @@ def overlay(
         # plot the ratio plot
         if rax is not None and idf > 0:
             rvals = pframe[yval] / lframe[yval]
+            # Let us remove underflow and overllow again
             rax.errorbar(
-                x=lframe[xval],
-                y=rvals,
-                yerr=np.abs(pframe[yval + "_err"] / lframe[yval]),
-                xerr=lframe[xval + "_err"],
+                x=lframe[xval].iloc[1:-1],
+                y=rvals.iloc[1:-1],
+                yerr=np.abs(pframe[yval + "_err"] / lframe[yval]).iloc[1:-1],
+                xerr=lframe[xval + "_err"].iloc[1:-1],
                 label=yval,
                 color=dstyle.get_color(),
                 fmt=dstyle.get_marker(),
